@@ -1,0 +1,17 @@
+@media (prefers-color-scheme: light) {
+    body,
+    .pageTitleArea,
+    .blogArea {
+        background-color: #fff;
+        color: #333;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body,
+    .pageTitleArea,
+    .blogArea {
+        background-color: #333;
+        color: #fff;
+    }
+}
