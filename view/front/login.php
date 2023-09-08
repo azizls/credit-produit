@@ -23,14 +23,20 @@ if(isset($_POST['submit'])){
       if($row['user_type'] == 'admin'){
 
          $_SESSION['admin_id'] = $row['id'];
-         header('location:admin_page.php');
+         header('location:..\back\pages\tables\tableU.php');
 
       }elseif($row['user_type'] == 'user'){
 
          $_SESSION['user_id'] = $row['id'];
-         header('location:home.php');
+         header('location:index.php');
 
-      }else{
+      }
+   elseif($row['user_type'] == 'fournisseur'){
+
+      $_SESSION['user_id'] = $row['id'];
+      header('location:ajoutertempproduit.php');
+
+   }else{
          $message[] = 'no user found!';
       }
 

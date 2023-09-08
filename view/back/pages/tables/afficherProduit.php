@@ -379,9 +379,9 @@
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
           <li class="nav-item">
-            <a class="nav-link" href="../../index.html">
+          <a class="nav-link" href="../../../front/index.php">
               <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Dashboard</span>
+              <span class="menu-title">front</span>
             </a>
           </li>
           <li class="nav-item nav-category">UI Elements</li>
@@ -471,6 +471,25 @@
         </ul>
       </nav>
       <!-- partial -->
+
+      <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- Menu déroulant pour le tri -->
+                <form action="trierproduit.php" method="get">
+                    <label for="tri">Trier par :</label>
+                    <select id="tri" name="tri" onchange="this.form.submit()">
+                        <option value="prix_asc">Prix Croissant</option>
+                        <option value="prix_desc">Prix Décroissant</option>
+                        <option value="categorie">Catégorie</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+      
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
@@ -481,21 +500,21 @@
                   <p class="card-description">
                     Add class <code>.table</code>
                   </p>
-
+                  
                   <body>
                   <form action="../tables/modifierProduit.php" method="POST">
                   <table border="1" align="center">
-                  <button><a href="../tables/tableU.php">la liste des utilisateurs</a></button>
-                  <button><a href="../forms/ajoutertempcategorie.php">ajouter à la liste des catégories</a></button>
+                  
+                  <button><a href="../tables/affichercategorie.php">afficher la liste des catégories</a></button>
                   <button><a href="../forms/ajoutertempproduit.php">ajouter à la liste des produits</a></button>
-                  <button><a href="../tables/trierProduit.php">trier les produit</a></button>
-                  <button><a href="../tables/rechercherProduit.php">chercher un produit</a></button>
+
+                  
 
                   <div class="table-responsive">
                     <table class="table">
                       <thead>
                         <tr>
-                              <th>id_produit</th>
+                         
                               <th>nom_produit</th>
                               <th>description</th>
                               <th>image</th>
@@ -510,7 +529,7 @@
                         foreach($listeProduit as $produit){
                       ?>
                       <tr>
-                      <td><?php echo $produit['nom_produit']; ?></td>
+                      
                       <td><?php echo $produit['nom_produit']; ?></td>
                       <td><?php echo $produit['description']; ?></td>
                       <td><?php echo $produit['image']; ?></td>
@@ -540,6 +559,23 @@
                 </div>
               </div>
             </div>
+
+            <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="search-box">
+                    <form action="chercherproduit.php" method="post">
+                        <div class="input-group">
+                            <input type="text" name="key" class="form-control" placeholder="Rechercher un produit...">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="submit" name="submit">Rechercher</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
         <!-- content-wrapper ends -->
         <!-- partial:../../partials/_footer.html -->
         <footer class="footer">

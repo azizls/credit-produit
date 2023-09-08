@@ -377,9 +377,9 @@
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
           <li class="nav-item">
-            <a class="nav-link" href="../../index.html">
+          <a class="nav-link" href="../../../front/index.php">
               <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Dashboard</span>
+              <span class="menu-title">front</span>
             </a>
           </li>
           <li class="nav-item nav-category">UI Elements</li>
@@ -471,6 +471,10 @@
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
+
+        <button><a href="../tables/affichercategorie.php">  la liste des catégories</a></button>
+                  <button><a href="../forms/register.php">           ajouter un utilisateur </a></button>
+                  <button><a href="../forms/ajoutertempcategorie.php">  ajouter des catégories</a></button>
           <div class="row">
             <div class="col-lg-20 grid-margin stretch-card">
               <div class="card">
@@ -479,8 +483,7 @@
                   <p class="card-description">
                     Add class <code>.table</code>
                   </p>
-                  <button><a href="../tables/affichercategorie.php">  la liste des catégories</a></button>
-                  <button><a href="../tables/afficherevenement.php">           la liste des évenements</a></button>
+                 
                   <div class="table-responsive">
                     <table class="table">
                       <thead>

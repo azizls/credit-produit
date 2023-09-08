@@ -1,414 +1,366 @@
-<?php 
 
-include "config.php";
- 
-if(isset($_POST['submit'])){
+<?php
+include 'config.php'; // Assurez-vous que le chemin vers config.php est correct.
+include 'controller/ProduitController.php';
+session_start();
 
-  // Count total files
-  $countfiles = count($_FILES['files']['name']);
- 
-  // Prepared statement
-  $query = "INSERT INTO images (name,image) VALUES(?,?)";
+$user_id = $_SESSION['user_id'];
 
-  $statement = $conn->prepare($query);
 
-  // Loop all files
-  for($i=0;$i<$countfiles;$i++){
+    
+    
+    $ProduitController=new ProduitController();
+	$listeProduit=$ProduitController->afficherproduit();
+   
 
-    // File name
-    $filename = $_FILES['files']['name'][$i];
-
-    // Location
-    $target_file = 'upload/'.$filename;
-
-    // file extension
-    $file_extension = pathinfo($target_file, PATHINFO_EXTENSION);
-    $file_extension = strtolower($file_extension);
-
-    // Valid image extension
-    $valid_extension = array("png","jpeg","jpg");
-
-    if(in_array($file_extension, $valid_extension)){
-
-       // Upload file
-       if(move_uploaded_file($_FILES['files']['tmp_name'][$i],$target_file)){
-
-          // Execute query
-	  $statement->execute(array($filename,$target_file));
-
-       }
-    }
- 
-  }
-  echo "File upload successfully";
-}
+$panier = array();
 ?>
+
+<html lang="en">
+<head>
+</head>
+<body>
+<?php
+// Inclure les fichiers nécessaires
+require_once 'Controller/ProduitController.php';
+require_once 'Controller/PanierController.php';
+
+// Initialiser les contrôleurs
+$produitController = new ProduitController();
+$panierController = new PanierController();
+
+
+$error = "";
+$success = 0;
+
+
+session_start();
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (!empty($_POST['quantite']) && !empty($_POST['id_produit'])) {
+            $id_produit = $_POST['id_produit'];
+            $quantite = $_POST['quantite'];
+
+           
+            $produit_panier = array(
+                'id_produit' => $id_produit,
+                'quantite' => $quantite,
+                'user_id' => $user_id // Inclure le user_id ici
+            );
+
+
+            $panierController->ajouterAuPanier($produit_panier);
+
+            $success = 1;
+        } else {
+            $error = "Veuillez remplir tous les champs.";
+        }
+    }
+} else {
+    $error = "Session utilisateur non définie. Vous devez être connecté pour ajouter un produit au panier.";
+}
+
+?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+  <head>
+
+  <script>
+    function ajouterAuPanier() {
+        var form = document.getElementById('ajouterAuPanierForm');
+        var formData = new FormData(form);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'ajouterpanier.php', true);
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // Gérer la réponse du serveur si nécessaire
+                alert('Produit ajouté au panier avec succès !');
+            } else {
+                alert('Erreur lors de l\'ajout au panier.');
+            }
+        };
+
+        xhr.send(formData);
+    }
+</script>
+
+<script>
+    // Récupérez la référence au menu déroulant
+    var triSelect = document.getElementById('tri');
+
+    // Ajoutez un gestionnaire d'événements pour détecter les changements de sélection
+    triSelect.addEventListener('change', function() {
+        // Récupérez la valeur de l'option sélectionnée
+        var selectedOption = triSelect.value;
+
+        // Effectuez une redirection vers trierproduit.php en incluant le critère de tri
+        window.location.href = 'trierproduit.php?tri=' + selectedOption;
+    });
+</script>
+
+
+
+
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Spark - Responsive Hosting, Domain, Technology HTML Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="assets/css/custom/style.css">
-    <link rel="stylesheet" href="assets/css/responsive/responsive.css">
-    <!-- favicon -->
-    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    <title>shop</title>
+<!--
+    
+TemplateMo 558 Klassy Cafe
 
-</head>
+https://templatemo.com/tm-558-klassy-cafe
 
-<body class="home2">
+-->
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
 
-    <div class="preloader">
-        <div class="sk-cube-grid">
-            <div class="sk-cube sk-cube1"></div>
-            <div class="sk-cube sk-cube2"></div>
-            <div class="sk-cube sk-cube3"></div>
-            <div class="sk-cube sk-cube4"></div>
-            <div class="sk-cube sk-cube5"></div>
-            <div class="sk-cube sk-cube6"></div>
-            <div class="sk-cube sk-cube7"></div>
-            <div class="sk-cube sk-cube8"></div>
-            <div class="sk-cube sk-cube9"></div>
+    <link rel="stylesheet" type="text/css" href="assets/css/font-awesome.css">
+
+    <link rel="stylesheet" href="assets/css/templatemo-klassy-cafe.css">
+
+    <link rel="stylesheet" href="assets/css/owl-carousel.css">
+
+    <link rel="stylesheet" href="assets/css/lightbox.css">
+
+    </head>
+    
+    <body>
+    
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
         </div>
-    </div>
-
-    <!-- ======= 1.01 Header Area ====== -->
-    <?php 
-     include_once('header.php');
-    ?>
-    <!-- ======= /1.01 Header Area ====== -->
-
-    <!-- ======= 1.02 Home Area ====== -->
-    <?php 
-     include_once('homeA.php');
-    ?>
-    <!-- ======= /1.02 Home Area ====== -->
-
-    <!-- ======= 1.03 Domain Area ====== -->
-    <div class="domainArea">
-        <div class="container animated">
+    </div>  
+    <!-- ***** Preloader End ***** -->
+    
+    
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+        <div class="container">
             <div class="row">
-                <div class="col-md-12 clearfix">
-                    <div class="domainTxt">
-                        <p>Search your Game, <br>purchase one.</p>
-                    </div>
-                    <form action="domainSearch.html" class="domainForm" method="get">
-                        <!-- replace domainSearch.html with your php file -->
-                        <div class="domainTop">
-                            <input type="search" name="search" placeholder="Enter your domain name here">
-                            <input type="submit" name="submit" value="Search Domain">
-                        </div>
-                        <div class="domainCheck">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <!-- ***** Logo Start ***** -->
+                        <a href="index.html" class="logo">
+                            <img src="assets/images/klassy-logo.png" align="klassy cafe html template">
+                        </a>
+                        <!-- ***** Logo End ***** -->
+                        <!-- ***** Menu Start ***** -->
+                        <ul class="nav">
+                            <li class="scroll-to-section"><a href="index.php" class="active">Home</a></li>
+                           
+                            <li class="scroll-to-section"><a href="logout.php">logout</a></li> 
+                            <li class="submenu">
+                                <a href="javascript:;">Features</a>
+                                <ul>
+                                    <li><a href="#">Features Page 1</a></li>
+                                    <li><a href="#">Features Page 2</a></li>
+                                    <li><a href="#">Features Page 3</a></li>
+                                    <li><a href="#">Features Page 4</a></li>
+                                </ul>
+                            </li>
+                            <!-- <li class=""><a rel="sponsored" href="https://templatemo.com" target="_blank">External URL</a></li> -->
+                            <li class="scroll-to-section"><a href="#reservation">Contact Us</a></li> 
+                        </ul>        
+                        <a class='menu-trigger'>
+                            <span>Menu</span>
+                        </a>
+                        <!-- ***** Menu End ***** -->
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- ***** Header Area End ***** -->
 
+
+    <!-- Ajoutez ceci où vous voulez afficher le champ de recherche et le bouton -->
+
+
+
+    <!-- ***** Menu Area Starts ***** -->
+
+
+    
+
+    <section class="section" id="menu">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="search-box">
+                    <form action="chercherproduit.php" method="post">
+                        <div class="input-group">
+                            <input type="text" name="key" class="form-control" placeholder="Rechercher un produit...">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="submit" name="submit">Rechercher</button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    <!-- ======= /1.03 Domain Area ====== -->
 
-    <!-- ======= 1.04 Service Area ====== -->
-    <div class="serviceArea secPdng animated">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- Menu déroulant pour le tri -->
+                <form action="trierproduit.php" method="get">
+                    <label for="tri">Trier par :</label>
+                    <select id="tri" name="tri" onchange="this.form.submit()">
+                        <option value="prix_asc">Prix Croissant</option>
+                        <option value="prix_desc">Prix Décroissant</option>
+                        <option value="categorie">Catégorie</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <?php
+            $count = 0;
+            foreach ($listeProduit as $produit) {
+                $image = $produit['image'];
+                $chemin_image = '/projet/projet 2A/view/front/image/' . $image;
+            ?>
+                <div class="col-lg-4">
+                    <div class='menu-card'>
+                        <div class="menu-card-header">
+                            <img src="<?php echo $chemin_image; ?>" alt="<?php echo $produit['nom_produit']; ?>" width="300" height="200" />
+                        </div>
+                        <div class="menu-card-body">
+                            <h3 class="menu-card-title"><?php echo $produit['nom_produit']; ?></h3>
+                            <p class="menu-card-description"><?php echo $produit['description']; ?></p>
+                            <p class="menu-card-description"><?php echo $produit['nom_categorie']; ?></p>
+                            <div class="menu-card-price">$<?php echo $produit['prix']; ?></div>
+                        </div>
+                        <div class="menu-card-footer">
+                            <form method="post" id="ajouterAuPanierForm">
+                                <input type="hidden" name="id_produit" value="<?php echo $produit['id_produit']; ?>">
+                                <div class="form-group">
+                                    <label for="quantite">Quantité:</label>
+                                    <input type="number" name="quantite" id="quantite" value="1" min="1">
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="ajouterAuPanier()">Ajouter Au Panier</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <?php
+                $count++;
+                if ($count % 3 == 0) {
+                    echo '</div><div class="row">'; // Fermez la ligne actuelle et commencez une nouvelle ligne après chaque troisième produit
+                }
+            }
+            ?>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+
+    <!-- ***** Menu Area Ends ***** -->
+
+   
+
+    <!-- ***** Reservation Us Area Starts ***** -->
+   
+    <!-- ***** Reservation Area Ends ***** -->
+
+    <!-- ***** Menu Area Starts ***** -->
+    
+    <!-- ***** Chefs Area Ends ***** --> 
+    
+    <!-- ***** Footer Start ***** -->
+    <footer>
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
-                    <div class="sectionTitle">
-                        <div class="h2">Lots of Gaming services in town. <br>Why you should <span>choose us?</span></div>
+                <div class="col-lg-4 col-xs-12">
+                    <div class="right-text-content">
+                            <ul class="social-icons">
+                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                                <li><a href="#"><i class="fa fa-instagram"></i></a></li>
+                            </ul>
                     </div>
                 </div>
-            </div>
-            <div class="row service">
-                <div class="col-md-4">
-                    <div class="singleService">
-                        <div class="serviceIcon">
-                            <img src="assets/img/icon/gear.png" alt="">
-                        </div>
-                        <div class="serviceContent">
-                            <span class="h3">Easy to use</span>
-                            <p>Just pick your game <br></p>
-                        </div>
+                <div class="col-lg-4">
+                    <div class="logo">
+                        <a href="index.html"><img src="assets/images/white-logo.png" alt=""></a>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="singleService">
-                        <div class="serviceIcon">
-                            <img src="assets/img/icon/up.jpg" alt="">
-                        </div>
-                        <div class="serviceContent">
-                            <span class="h3">Acces to game </span>
-                            <p>You will be able to buy acces to your game for 5 days <br>so you can try anygame you want right now!</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="singleService">
-                        <div class="serviceIcon">
-                            <img src="assets/img/icon/247.png" alt="">
-                        </div>
-                        <div class="serviceContent">
-                            <span class="h3">24/7 customer support</span>
-                            <p>We are pleased that our team is working 24/7 <br></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="singleService">
-                        <div class="serviceIcon">
-                            <img src="assets/img/icon/Best.png" alt="">
-                        </div>
-                        <div class="serviceContent">
-                            <span class="h3">Best product</span>
-                            <p>Every single game you want. <br></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="singleService">
-                        <div class="serviceIcon">
-                            <img src="assets/img/icon/Update.jpg" alt="">
-                        </div>
-                        <div class="serviceContent">
-                            <span class="h3">UPDATES AND OFFERS</span>
-                            <p>We are working to make sure you have every version of your game <br>Available & more.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="singleService">
-                        <div class="serviceIcon">
-                            <img src="assets/img/icon/chat.jpg" alt="">
-                        </div>
-                        <div class="serviceContent">
-                            <span class="h3">Live Chat Support</span>
-                            <p>Best community you will ever join.<br></p>
-                        </div>
+                <div class="col-lg-4 col-xs-12">
+                    <div class="left-text-content">
+                        <p>© Copyright Klassy Cafe Co.
+                        
+                        <br>Design: TemplateMo</p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- ======= /1.04 Service Area ====== -->
+    </footer>
 
-    <div class="sectionBar"></div>
+    <!-- jQuery -->
+    <script src="assets/js/jquery-2.1.0.min.js"></script>
 
-    <!-- ======= 1.05 Pricing Area ====== -->
-    <div class="pricingArea secPdng animated">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="sectionTitle">
-                        <div class="h2">Pay for what you <span>actually</span> use. No hidden charge!</div>
-                    </div>
-                </div>
-            </div>
-            <div class="row price clearfix">
-                <div class="col-lg-3 offset-lg-0 priceCol col-md-5 offset-md-1">
-                    <div class="singlePrice">
-                        <div class="priceHead">
-                            <span class="priceTitle">1 Day acces</span>
-                            <div class="priceImg">
-                                <img src="assets/img/icon/user.png" alt="">
-                            </div>
-                            <div class="currency">$2<span>/Day</span></div>
-                            <p>best for you</p>
-                        </div>
-                        <ul class="priceBody">
-                            <li><i class="icofont icofont-ui-check"></i>acces to your game for limited time</li>
-                            <li><i class="icofont icofont-ui-check"></i>1 Free Day for first time</li>
-                            <li><i class="icofont icofont-ui-check"></i>fresh start</li>
-                            <li><i class="icofont icofont-ui-close"></i>Special Offers</li>
-                            <li><i class="icofont icofont-ui-check"></i>Unlimited Support</li>
-                        </ul>
-                        <a href="" class="priceBtn Btn">Get Started now</a>
-                    </div>
-                </div>
-                <div class="col-lg-3 priceCol col-md-5">
-                    <div class="singlePrice active">
-                        <div class="priceHead">
-                            <span class="priceTitle">2 Day acces</span>
-                            <div class="priceImg">
-                                <img src="assets/img/icon/users.png" alt="">
-                            </div>
-                            <div class="currency">$2<span>/day</span></div>
-                            <p>best for personal use</p>
-                        </div>
-                        <ul class="priceBody">
-                            <li><i class="icofont icofont-ui-check"></i>acces to your game for limited time</li>
-                            <li><i class="icofont icofont-ui-check"></i>1 Free Day for first time</li>
-                            <li><i class="icofont icofont-ui-check"></i>fresh start</li>
-                            <li><i class="icofont icofont-ui-close"></i>Special Offers</li>
-                            <li><i class="icofont icofont-ui-check"></i>Unlimited Support</li>
-                        </ul>
-                        <a href="" class="priceBtn Btn">Get Started now</a>
-                    </div>
-                </div>
-                <div class="col-lg-3 offset-lg-0 priceCol col-md-5 offset-md-1">
-                    <div class="singlePrice">
-                        <div class="priceHead">
-                            <span class="priceTitle">4 Day acces</span>
-                            <div class="priceImg">
-                                <img src="assets/img/icon/users.png" alt="">
-                            </div>
-                            <div class="currency">$2<span>/day</span></div>
-                            <p>best for personal use</p>
-                        </div>
-                        <ul class="priceBody">
-                            <li><i class="icofont icofont-ui-check"></i>acces to your game for limited time</li>
-                            <li><i class="icofont icofont-ui-check"></i>2 Free Day for first time</li>
-                            <li><i class="icofont icofont-ui-check"></i>fresh start</li>
-                            <li><i class="icofont icofont-ui-close"></i>Special Offers</li>
-                            <li><i class="icofont icofont-ui-check"></i>Unlimited Support</li>
-                        </ul>
-                        <a href="" class="priceBtn Btn">Get Started now</a>
-                    </div>
-                </div>
-                <div class="col-lg-3 priceCol col-md-5">
-                    <div class="singlePrice">
-                        <div class="priceHead">
-                            <span class="priceTitle">7 Day acces</span>
-                            <div class="priceImg">
-                                <img src="assets/img/icon/users.png" alt="">
-                            </div>
-                            <div class="currency">$2<span>/day</span></div>
-                            <p>best for personal use</p>
-                        </div>
-                        <ul class="priceBody">
-                            <li><i class="icofont icofont-ui-check"></i>acces to your game for limited time</li>
-                            <li><i class="icofont icofont-ui-check"></i>3 Free Day for first time</li>
-                            <li><i class="icofont icofont-ui-check"></i>fresh start</li>
-                            <li><i class="icofont icofont-ui-close"></i>Special Offers</li>
-                            <li><i class="icofont icofont-ui-check"></i>Unlimited Support</li>
-                        </ul>
-                        <a href="" class="priceBtn Btn">Get Started now</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ======= /1.05 Pricing Area ====== -->
-
-    <!-- ======= 1.06 Cta Area ====== -->
-    <div class="ctaArea secPdngB animated">
-        <div class="container">
-            <div class="row ctaRow">
-                <div class="col-md-6">
-                    <div class="ctaImgOne">
-                        <img src="img/server.jpg" alt="">
-                    </div>
-                </div>
-                <div class="col-md-6 ctaCol">
-                    <div class="ctaRight ctaTxt">
-                        <div class="ctaCell">
-                            <div class="h2">Buy any game of you choice</div>
-                            <p>If you test the game you like <br>you can as well buy it .</p>
-                            <a href="#" class="ctaBtn Btn"><i class="icofont icofont-rocket-alt-2"></i>Get Started Now</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6 ctaCol">
-                    <div class="ctaLeft ctaTxt">
-                        <div class="ctaCell">
-                            <div class="h2">Buy any game of you choice</div>
-                            <p>If you test the game you like <br>you can as well buy it .</p>
-                            <div class="ctaBtn">
-                                <a href="#" class="btnOne Btn">read more</a>
-                                <a href="#" class="btnTwo Btn">Get Started Now</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-5 col-md-offset-1 ctaColBtm">
-                    <div class="ctaImgTwo">
-                        <img src="img/home-dsk-2.jpg" alt="">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ======= /1.06 Cta Area ====== -->
-
-    <!-- ======= 1.07 client Area ====== -->
-    <div class="clientArea secPdng animated">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="sectionTitle">
-                        <div class="h2">We give <span>awesome service,</span><br>Some of our trusted clients.</div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-2 col-md-4 col-6">
-                    <div class="singleClient">
-                        <a href="#"><img src="img/client-1.jpg" alt=""></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-6">
-                    <div class="singleClient">
-                        <a href="#"><img src="img/client-2.jpg" alt=""></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-6">
-                    <div class="singleClient">
-                        <a href="#"><img src="img/client-3.jpg" alt=""></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-6">
-                    <div class="singleClient">
-                        <a href="#"><img src="img/client-4.jpg" alt=""></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-6">
-                    <div class="singleClient">
-                        <a href="#"><img src="img/client-5.jpg" alt=""></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-6">
-                    <div class="singleClient">
-                        <a href="#"><img src="img/client-6.jpg" alt=""></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ======= /1.07 client Area ====== -->
-
-    <!-- ======= 1.08 ctaTwo Area ====== -->
-    <div class="ctaTwo">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 animated">
-                    <span class="ctaTxtTwo">20,000+ People trust Sparks! Be one of them today.</span>
-                    <div class="ctaBtn"><a href="#" class="btnOne Btn">Get Started now</a></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ======= /1.08 ctaTwo Area ====== -->
-
-    <!-- ======= 1.09 footer Area ====== -->
-    <!-- ======= 1.09 footer Area ====== -->
-    <?php 
-     include_once('footer.php');
-    ?>
-    <!-- ======= /1.09 footer Area ====== -->
-
-
-    <script src="assets/js/jquery.1.11.3.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="assets/js/popper.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
-    <script src="assets/js/owl.carousel.min.js"></script>
+
+    <!-- Plugins -->
+    <script src="assets/js/owl-carousel.js"></script>
+    <script src="assets/js/accordions.js"></script>
+    <script src="assets/js/datepicker.js"></script>
+    <script src="assets/js/scrollreveal.min.js"></script>
     <script src="assets/js/waypoints.min.js"></script>
-    <script src="assets/js/active.js"></script>
-    <script src="assets/js/chatScript.js" type="text/javascript"></script>
+    <script src="assets/js/jquery.counterup.min.js"></script>
+    <script src="assets/js/imgfix.min.js"></script> 
+    <script src="assets/js/slick.js"></script> 
+    <script src="assets/js/lightbox.js"></script> 
+    <script src="assets/js/isotope.js"></script> 
+    
+    <!-- Global Init -->
+    <script src="assets/js/custom.js"></script>
+    <script>
 
+        $(function() {
+            var selectedClass = "";
+            $("p").click(function(){
+            selectedClass = $(this).attr("data-rel");
+            $("#portfolio").fadeTo(50, 0.1);
+                $("#portfolio div").not("."+selectedClass).fadeOut();
+            setTimeout(function() {
+              $("."+selectedClass).fadeIn();
+              $("#portfolio").fadeTo(50, 1);
+            }, 500);
+                
+            });
+        });
 
-</body>
-
+    </script>
+  </body>
 </html>

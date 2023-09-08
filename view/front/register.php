@@ -2,6 +2,7 @@
 
 include 'config.php';
 
+$conn = config::getConnexion();
 if(isset($_POST['submit'])){
 
    $name = $_POST['name'];

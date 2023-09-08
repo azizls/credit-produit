@@ -18,8 +18,6 @@ include_once '../model/produit.php';
 include_once '../controller/CategorieController.php';
 include_once '../controller/ProduitController.php';
 
-
-
 $error = "";
 $success = 0;
 
@@ -32,22 +30,55 @@ $categorieController = new CategorieController();
 $produitController = new ProduitController();
 
 // Start session
-
 session_start();
-if (isset($_SESSION['admin_id'])) {
-    $user_id = $_SESSION['admin_id'];
+if (isset($_SESSION['fournisseur'])) {
+    $user_id = $_SESSION['fournisseur'];
 
     if (isset($_POST["submit"])) {
         if (!empty($_POST['nom_produit']) && !empty($_POST['description']) && !empty($_POST['prix']) && !empty($_POST['nom_categorie'])) {
             // Récupérez la valeur du champ de formulaire nom_categorie
             $nomCategorie = $_POST['nom_categorie'];
 
+            // Gestion du téléchargement d'image
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                // Le fichier a été correctement téléchargé
+                $imageFileName = $_FILES['image']['name'];
+
+                // Assurez-vous que le dossier de destination existe
+                $destinationFolder = 'C:\xampp1\htdocs\projet\projet 2A\view\front\image'; // Chemin de destination
+                if (!file_exists($destinationFolder)) {
+                    mkdir($destinationFolder, 0777, true); // Créer le dossier s'il n'existe pas
+                }
+
+                // Chemin complet du fichier de destination
+                $destinationPath = $destinationFolder . '/' . $imageFileName;
+
+                // Vérifiez si le fichier existe déjà, si c'est le cas, ajoutez un préfixe ou générez un nom unique
+                $counter = 1;
+                while (file_exists($destinationPath)) {
+                    $fileNameParts = pathinfo($imageFileName);
+                    $imageFileName = $fileNameParts['filename'] . '_' . $counter . '.' . $fileNameParts['extension'];
+                    $destinationPath = $destinationFolder . '/' . $imageFileName;
+                    $counter++;
+                }
+
+                // Déplacez le fichier téléchargé vers le dossier de destination
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $destinationPath)) {
+                    // Le fichier a été déplacé avec succès, vous pouvez maintenant l'utiliser dans votre code.
+
+                    // Enregistrez le nom de l'image dans la base de données
+                    $imageFileNameInDB = $imageFileName;
+                } else {
+                    $error = "Erreur lors du déplacement du fichier.";
+                }
+            }
+
             // Ensuite, créez le produit avec la catégorie associée
             $produit = new Produit(
                 null,
                 $_POST['nom_produit'],
                 $_POST['description'],
-                $_FILES['image']['name'], // Utilisez le nom du fichier image ici
+                $imageFileNameInDB, // Stockez seulement le nom de l'image dans la base de données
                 $_POST['prix'],
                 $nomCategorie,
                 $user_id // Utilisez l'ID de l'utilisateur ici
@@ -56,7 +87,7 @@ if (isset($_SESSION['admin_id'])) {
             try {
                 if ($produitController->ajouterProduit($produit)) {
                     // Rediriger vers la liste des produits ou faire une autre action souhaitée
-                    header('Location: ../tables/afficheProduit.php');
+                    header('Location: ../tables/afficherProduit.php');
                     exit(); // Assurez-vous de terminer le script ici pour éviter toute exécution ultérieure.
                 } else {
                     $error = "Erreur lors de l'ajout du produit.";
@@ -74,7 +105,6 @@ if (isset($_SESSION['admin_id'])) {
     $error = "Session utilisateur non définie. Vous devez être connecté pour ajouter un produit.";
 }
 ?>
-
 
 
 
@@ -461,9 +491,9 @@ if (isset($_SESSION['admin_id'])) {
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
           <li class="nav-item">
-            <a class="nav-link" href="../../index.html">
+          <a class="nav-link" href="../../../front/index.php">
               <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Dashboard</span>
+              <span class="menu-title">front</span>
             </a>
           </li>
           <li class="nav-item nav-category">UI Elements</li>

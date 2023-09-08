@@ -551,7 +551,7 @@ if(isset($message)){
 </div>
 <select name="user_type">
          <option value="admin">admin</option>
-         <option value="user">user</option>
+         <option value="fournisseur">fournisseur</option>
       </select>
       <div class="form-group">
       <input type="number" name="etat" class="form-control" placeholder="enter your etat" required>

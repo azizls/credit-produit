@@ -34,13 +34,13 @@ if (isset($_POST['submit'])) {
         if ($row['user_type'] == 'admin') {
             // Si l'utilisateur est un admin, définir admin_id dans la session
             $_SESSION['admin_id'] = $row['id'];
-            header('Location: http://localhost/projet/projet%202A/view/back/pages/forms/ajoutertempproduit.php');
+            header('Location: http://localhost/projet/projet%202A/view/back/pages/tables/tableU.php');
             exit();
-        } elseif ($row['user_type'] == 'user') {
+        } elseif ($row['user_type'] == 'fournisseur') {
             // Si l'utilisateur est un utilisateur standard, définir user_id dans la session
-            $_SESSION['user_id'] = $row['id'];
+            $_SESSION['fournisseur'] = $row['id'];
             // Rediriger vers la page d'accueil des utilisateurs, ajustez l'URL selon votre structure de fichiers
-            // header('Location: http://localhost/projet/view/front/home.php');
+             header('Location: http://localhost/projet/projet%202A/view/back/pages/forms/ajoutertempproduit.php');
             // exit();
         } else {
             $message[] = 'Aucun utilisateur trouvé !';
@@ -101,7 +101,7 @@ if(isset($message)){
       <input type="email" name="email" class="box" placeholder="enter your email" required>
       <input type="password" name="pass" class="box" placeholder="enter your password" required>
       <input type="submit" value="login now" class="btn" name="submit">
-      <p>don't have an account? <a href="register.php">register now</a></p>
+
    </form>
 
 </section>

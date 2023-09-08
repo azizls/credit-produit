@@ -1,9 +1,19 @@
 <?php
 	include '../controller/CategorieController.php';
-    
+
+
+  session_start();
+
+  $user_id = $_SESSION['user_id'];
+  
     
     $categoriecontroller=new categoriecontroller();
 	$listecategorie=$categoriecontroller->affichercategorie();
+
+
+
+
+  
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,7 +61,7 @@
       <div class="navbar-menu-wrapper d-flex align-items-top"> 
         <ul class="navbar-nav">
           <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
-            <h1 class="welcome-text">Good Morning, <span class="text-black fw-bold">John Doe</span></h1>
+            <h1 class="welcome-text"> credit shop <span class="text-black fw-bold"></span></h1>
             <h3 class="welcome-sub-text">Your performance summary this week </h3>
           </li>
         </ul>
@@ -379,9 +389,9 @@
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
           <li class="nav-item">
-            <a class="nav-link" href="../../index.html">
+            <a class="nav-link" href="../../../front/index.php">
               <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Dashboard</span>
+              <span class="menu-title">front</span>
             </a>
           </li>
           <li class="nav-item nav-category">UI Elements</li>
@@ -485,9 +495,10 @@
                   <body>
                   <form action="../tables/modifiercategorie.php" method="POST">
                   <table border="1" align="center">
-                  <button><a href="../tables/tableU.php">la liste des utilisateurs</a></button>
-                  <button><a href="../tables/afficherevenement.php">la liste des événements</a></button>
-                  <button><a href="../forms/ajoutertempcategorie.php">ajouter à la liste des categories</a></button>
+
+
+
+                  <button><a href="../tables/afficherproduit.php">la liste des produits</a></button>
                   <div class="table-responsive">
                     <table class="table">
                       <thead>
